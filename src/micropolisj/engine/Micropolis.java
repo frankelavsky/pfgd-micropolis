@@ -1240,8 +1240,8 @@ public class Micropolis
 				}
 			}
 		}
-
-		pollutionAverage = pcount != 0 ? (ptotal / pcount) : 0;
+		int policies = 5;
+		pollutionAverage = pcount != 0 ? (ptotal / pcount) + policies : 0;
 
 		terrainMem = smoothTerrain(qtem);
 
@@ -1763,13 +1763,14 @@ public class Micropolis
 	{
 		int revenue = budget.taxFund / TAXFREQ;
 		int expenses = -(budget.roadFundEscrow + budget.fireFundEscrow + budget.policeFundEscrow) / TAXFREQ;
+		int policies = 100;
 
 		FinancialHistory hist = new FinancialHistory();
 		hist.cityTime = cityTime;
 		hist.taxIncome = revenue;
 		hist.operatingExpenses = expenses;
 
-		cashFlow = revenue - expenses;
+		cashFlow = revenue - expenses + policies;
 		spend(-cashFlow);
 
 		hist.totalFunds = budget.totalFunds;
