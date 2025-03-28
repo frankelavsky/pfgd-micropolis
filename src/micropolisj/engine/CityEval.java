@@ -264,7 +264,9 @@ public class CityEval
 
 		z = clamp(z, 0, 1000);
 
-		cityScore = (int)Math.round((cityScore + z) / 2.0);
+		double policies = 1.10;
+		cityScore = (int)Math.round(((cityScore + z) / 2.0)*policies);
+		System.out.println(cityScore);
 		deltaCityScore = cityScore - oldCityScore;
 	}
 
