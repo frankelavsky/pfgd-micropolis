@@ -267,7 +267,7 @@ public class CityEval
 		// below we calculate the cuts to parks and rec across the city and how it affects happiness
 		// base happiness adds +5% more voting approval, but cutting recreation could hurt happiness as much as 20%
 		BudgetNumbers b = engine.generateBudget();
-		double recreationCuts = 0.2*(b.parksFunded / (engine.lastCityPop/100));
+		double recreationCuts = 0.2*(b.parksFunded / (Math.max(engine.lastCityPop/100, 1)));
 		double happinessFactor = 1.05 - recreationCuts;
 		System.out.println("recreationCuts");
 		System.out.println(recreationCuts);
