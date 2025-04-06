@@ -875,15 +875,9 @@ public class Micropolis
 					z = Math.min(250, z);
 					z = Math.max(0, z);
 					
-					System.out.println("z");
-					System.out.println(z);
-					
 					z += (int)Math.round(z*educationCuts);
 					z = Math.min(250, z);
 					z = Math.max(0, z);
-					
-					System.out.println("z after");
-					System.out.println(z);
 
 					crimeMem[hy][hx] = z;
 
