@@ -10,10 +10,9 @@ package micropolisj.gui;
 
 import java.awt.*;
 import java.awt.event.*;
+import java.util.*;
 import javax.swing.*;
 import javax.swing.event.*;
-import java.util.*;
-
 import micropolisj.engine.*;
 import static micropolisj.gui.MainWindow.formatFunds;
 import static micropolisj.gui.MainWindow.formatGameDate;
@@ -27,6 +26,9 @@ public class BudgetDialog extends JDialog
 	double origRoadPct;
 	double origFirePct;
 	double origPolicePct;
+	double origEduPct;
+	double origHealthPct;
+	double origParksPct;
 
 	JLabel roadFundRequest = new JLabel();
 	JLabel roadFundAlloc = new JLabel();
@@ -73,9 +75,9 @@ public class BudgetDialog extends JDialog
 		engine.roadPercent = (double)newRoadPct / 100.0;
 		engine.policePercent = (double)newPolicePct / 100.0;
 		engine.firePercent = (double)newFirePct / 100.0;
-		engine.eduPercent = (double)newEduPct / 100.0;
-		engine.healthPercent = (double)newHealthPct / 100.0;
-		engine.parksPercent = (double)newParksPct / 100.0;
+		engine.eduPercent = 1 - (double)newEduPct / 100.0;
+		engine.healthPercent = 1 - (double)newHealthPct / 100.0;
+		engine.parksPercent = 1 - (double)newParksPct / 100.0;
 
 		loadBudgetNumbers(false);
 	}
@@ -85,13 +87,14 @@ public class BudgetDialog extends JDialog
 		BudgetNumbers b = engine.generateBudget();
 		if (updateEntries)
 		{
+			System.out.println("updating entries!");
 		taxRateEntry.setValue(b.taxRate);
 		roadFundEntry.setValue((int)Math.round(b.roadPercent*100.0));
 		policeFundEntry.setValue((int)Math.round(b.policePercent*100.0));
 		fireFundEntry.setValue((int)Math.round(b.firePercent*100.0));
-		eduFundEntry.setValue((int)Math.round(b.eduPercent*100.0));
-		healthFundEntry.setValue((int)Math.round(b.healthPercent*100.0));
-		parksFundEntry.setValue((int)Math.round(b.parksPercent*100.0));
+		eduFundEntry.setValue(100-(int)Math.round(b.eduPercent*100.0));
+		healthFundEntry.setValue(100-(int)Math.round(b.healthPercent*100.0));
+		parksFundEntry.setValue(100-(int)Math.round(b.parksPercent*100.0));
 		}
 
 		taxRevenueLbl.setText(formatFunds(b.taxIncome));
@@ -133,6 +136,9 @@ public class BudgetDialog extends JDialog
 		this.origRoadPct = engine.roadPercent;
 		this.origFirePct = engine.firePercent;
 		this.origPolicePct = engine.policePercent;
+		this.origEduPct = engine.eduPercent;
+		this.origHealthPct = engine.healthPercent;
+		this.origParksPct = engine.parksPercent;
 
 		// give text fields of the fund-level spinners a minimum size
 		taxRateEntry = new JSpinner(new SpinnerNumberModel(7,0,20,1));
@@ -373,6 +379,9 @@ public class BudgetDialog extends JDialog
 		engine.roadPercent = this.origRoadPct;
 		engine.firePercent = this.origFirePct;
 		engine.policePercent = this.origPolicePct;
+		engine.eduPercent = this.origEduPct;
+		engine.healthPercent = this.origHealthPct;
+		engine.parksPercent = this.origParksPct;
 		loadBudgetNumbers(true);
 	}
 
