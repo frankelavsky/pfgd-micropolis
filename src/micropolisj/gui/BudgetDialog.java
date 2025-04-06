@@ -40,6 +40,18 @@ public class BudgetDialog extends JDialog
 	JLabel fireFundAlloc = new JLabel();
 	JSlider fireFundEntry;
 
+	JLabel eduFundRequest = new JLabel();
+	JLabel eduFundAlloc = new JLabel();
+	JSlider eduFundEntry;
+
+	JLabel healthFundRequest = new JLabel();
+	JLabel healthFundAlloc = new JLabel();
+	JSlider healthFundEntry;
+
+	JLabel parksFundRequest = new JLabel();
+	JLabel parksFundAlloc = new JLabel();
+	JSlider parksFundEntry;
+
 	JLabel taxRevenueLbl = new JLabel();
 
 	static ResourceBundle strings = MainWindow.strings;
@@ -53,11 +65,17 @@ public class BudgetDialog extends JDialog
 		int newRoadPct = ((Number) roadFundEntry.getValue()).intValue();
 		int newPolicePct = ((Number) policeFundEntry.getValue()).intValue();
 		int newFirePct = ((Number) fireFundEntry.getValue()).intValue();
+		int newEduPct = ((Number) eduFundEntry.getValue()).intValue();
+		int newHealthPct = ((Number) healthFundEntry.getValue()).intValue();
+		int newParksPct = ((Number) parksFundEntry.getValue()).intValue();
 
 		engine.cityTax = newTaxRate;
 		engine.roadPercent = (double)newRoadPct / 100.0;
 		engine.policePercent = (double)newPolicePct / 100.0;
 		engine.firePercent = (double)newFirePct / 100.0;
+		engine.eduPercent = (double)newEduPct / 100.0;
+		engine.healthPercent = (double)newHealthPct / 100.0;
+		engine.parksPercent = (double)newParksPct / 100.0;
 
 		loadBudgetNumbers(false);
 	}
@@ -71,6 +89,9 @@ public class BudgetDialog extends JDialog
 		roadFundEntry.setValue((int)Math.round(b.roadPercent*100.0));
 		policeFundEntry.setValue((int)Math.round(b.policePercent*100.0));
 		fireFundEntry.setValue((int)Math.round(b.firePercent*100.0));
+		eduFundEntry.setValue((int)Math.round(b.eduPercent*100.0));
+		healthFundEntry.setValue((int)Math.round(b.healthPercent*100.0));
+		parksFundEntry.setValue((int)Math.round(b.parksPercent*100.0));
 		}
 
 		taxRevenueLbl.setText(formatFunds(b.taxIncome));
@@ -83,6 +104,15 @@ public class BudgetDialog extends JDialog
 
 		fireFundRequest.setText(formatFunds(b.fireRequest));
 		fireFundAlloc.setText(formatFunds(b.fireFunded));
+
+		eduFundRequest.setText(formatFunds(b.eduRequest));
+		eduFundAlloc.setText(formatFunds(b.eduFunded));
+
+		healthFundRequest.setText(formatFunds(b.healthRequest));
+		healthFundAlloc.setText(formatFunds(b.healthFunded));
+
+		parksFundRequest.setText(formatFunds(b.parksRequest));
+		parksFundAlloc.setText(formatFunds(b.parksFunded));
 	}
 
 	static void adjustSliderSize(JSlider slider)
@@ -114,6 +144,12 @@ public class BudgetDialog extends JDialog
 		adjustSliderSize(fireFundEntry);
 		policeFundEntry = new JSlider(JSlider.HORIZONTAL, 0, 100, 100);
 		adjustSliderSize(policeFundEntry);
+		eduFundEntry = new JSlider(JSlider.HORIZONTAL, 0, 100, 100);
+		adjustSliderSize(eduFundEntry);
+		healthFundEntry = new JSlider(JSlider.HORIZONTAL, 0, 100, 100);
+		adjustSliderSize(healthFundEntry);
+		parksFundEntry = new JSlider(JSlider.HORIZONTAL, 0, 100, 100);
+		adjustSliderSize(parksFundEntry);
 
 		ChangeListener change = new ChangeListener() {
 		public void stateChanged(ChangeEvent ev) {
@@ -124,6 +160,9 @@ public class BudgetDialog extends JDialog
 		roadFundEntry.addChangeListener(change);
 		fireFundEntry.addChangeListener(change);
 		policeFundEntry.addChangeListener(change);
+		eduFundEntry.addChangeListener(change);
+		healthFundEntry.addChangeListener(change);
+		parksFundEntry.addChangeListener(change);
 
 		Box mainBox = new Box(BoxLayout.Y_AXIS);
 		mainBox.setBorder(BorderFactory.createEmptyBorder(8,8,8,8));
@@ -233,6 +272,29 @@ public class BudgetDialog extends JDialog
 		fundingRatesPane.add(fireFundEntry, c1);
 		fundingRatesPane.add(fireFundRequest, c2);
 		fundingRatesPane.add(fireFundAlloc, c3);
+
+		c1.gridy = c2.gridy = c3.gridy = 4;
+		fundingRatesPane.add(new JLabel(strings.getString("budgetdlg.divest_level_hdr")), c1);
+		fundingRatesPane.add(new JLabel(strings.getString("budgetdlg.divested_hdr")), c2);
+		fundingRatesPane.add(new JLabel(strings.getString("budgetdlg.divest_allocation_hdr")), c3);
+
+		c0.gridy = c1.gridy = c2.gridy = c3.gridy = 5;
+		fundingRatesPane.add(new JLabel(strings.getString("budgetdlg.education_fund")), c0);
+		fundingRatesPane.add(eduFundEntry, c1);
+		fundingRatesPane.add(eduFundRequest, c2);
+		fundingRatesPane.add(eduFundAlloc, c3);
+
+		c0.gridy = c1.gridy = c2.gridy = c3.gridy = 6;
+		fundingRatesPane.add(new JLabel(strings.getString("budgetdlg.health_fund")), c0);
+		fundingRatesPane.add(healthFundEntry, c1);
+		fundingRatesPane.add(healthFundRequest, c2);
+		fundingRatesPane.add(healthFundAlloc, c3);
+
+		c0.gridy = c1.gridy = c2.gridy = c3.gridy = 7;
+		fundingRatesPane.add(new JLabel(strings.getString("budgetdlg.parks_fund")), c0);
+		fundingRatesPane.add(parksFundEntry, c1);
+		fundingRatesPane.add(parksFundRequest, c2);
+		fundingRatesPane.add(parksFundAlloc, c3);
 
 		return fundingRatesPane;
 	}

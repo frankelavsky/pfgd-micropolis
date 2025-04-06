@@ -37,6 +37,21 @@ public class CityBudget
 	 * Amount of prepaid police station maintenance (in 1/TAXFREQ's).
 	 */
 	int policeFundEscrow;
+	
+	/**
+	 * Amount of divested funds taken from healthcare (in 1/TAXFREQ's).
+	 */
+	int healthcareDivestment;
+
+	/**
+	 * Amount of divested funds taken from parks and recreation (in 1/TAXFREQ's).
+	 */
+	int parksDivestment;
+
+	/**
+	 * Amount of divested funds taken from education (in 1/TAXFREQ's).
+	 */
+	int educationDivestment;
 
 	CityBudget(Micropolis city)
 	{
