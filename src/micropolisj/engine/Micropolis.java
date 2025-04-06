@@ -851,6 +851,16 @@ public class Micropolis
 			}
 		}
 
+		// here we add to the crime increase based on education cuts
+		// more cuts to education = up to 15% more crime!
+		BudgetNumbers b = generateBudget();
+		System.out.println("Math.max(1, lastCityPop/50)");
+		System.out.println(Math.max(1, lastCityPop/50));
+		double educationCuts = 0.15*Math.round((b.eduFunded / (Math.max(1, lastCityPop/50))));
+		
+		System.out.println("education cuts");
+		System.out.println(educationCuts);
+
 		int count = 0;
 		int sum = 0;
 		int cmax = 0;
@@ -864,6 +874,17 @@ public class Micropolis
 					z -= policeMap[hy/4][hx/4];
 					z = Math.min(250, z);
 					z = Math.max(0, z);
+					
+					System.out.println("z");
+					System.out.println(z);
+					
+					z += (int)Math.round(z*educationCuts);
+					z = Math.min(250, z);
+					z = Math.max(0, z);
+					
+					System.out.println("z after");
+					System.out.println(z);
+
 					crimeMem[hy][hx] = z;
 
 					sum += z;
@@ -880,10 +901,13 @@ public class Micropolis
 		}
 
 		if (count != 0)
-			crimeAverage = sum / count;
+			crimeAverage = (sum / count);
 		else
 			crimeAverage = 0;
 
+
+		System.out.println("crimeAverage");
+		System.out.println(crimeAverage);
 		fireMapOverlayDataChanged(MapState.POLICE_OVERLAY);
 	}
 
@@ -1253,7 +1277,7 @@ public class Micropolis
 		int healthcareCuts = Math.round(b.healthFunded / 5);
 		System.out.println("healthcare cuts");
 		System.out.println(healthcareCuts);
-		
+
 		pollutionAverage = pcount != 0 ? (ptotal / pcount) + healthcareCuts : 0;
 
 		terrainMem = smoothTerrain(qtem);
