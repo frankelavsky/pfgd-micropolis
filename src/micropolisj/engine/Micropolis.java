@@ -172,11 +172,17 @@ public class Micropolis
 	public double roadPercent = 1.0;
 	public double policePercent = 1.0;
 	public double firePercent = 1.0;
+	public double eduPercent = 1.0;
+	public double healthPercent = 1.0;
+	public double parksPercent = 1.0;
 
 	int taxEffect = 7;
 	int roadEffect = 32;
 	int policeEffect = 1000;
 	int fireEffect = 1000;
+	int eduEffect = 1000;
+	int healthEffect = 1000;
+	int parksEffect = 1000;
 
 	int cashFlow; //net change in totalFunds in previous year
 
@@ -1240,8 +1246,15 @@ public class Micropolis
 				}
 			}
 		}
-		int policies = 5;
-		pollutionAverage = pcount != 0 ? (ptotal / pcount) + policies : 0;
+
+		// here we add to the pollution average (the "damage") based on healthcare cuts
+		// more cuts to healthcare = more pollution "damage"
+		BudgetNumbers b = generateBudget();
+		int healthcareCuts = Math.round(b.healthFunded / 5);
+		System.out.println("healthcare cuts");
+		System.out.println(healthcareCuts);
+		
+		pollutionAverage = pcount != 0 ? (ptotal / pcount) + healthcareCuts : 0;
 
 		terrainMem = smoothTerrain(qtem);
 
@@ -1737,6 +1750,12 @@ public class Micropolis
 		budget.roadFundEscrow -= b.roadFunded;
 		budget.fireFundEscrow -= b.fireFunded;
 		budget.policeFundEscrow -= b.policeFunded;
+		budget.educationDivestment = b.eduFunded;
+		budget.healthcareDivestment = b.healthFunded;
+		budget.parksDivestment = b.parksFunded;
+
+		System.out.println("budget.educationDivestment");
+		System.out.println(budget.educationDivestment);
 
 		taxEffect = b.taxRate;
 		roadEffect = b.roadRequest != 0 ?
@@ -1748,6 +1767,15 @@ public class Micropolis
 		fireEffect = b.fireRequest != 0 ?
 			(int)Math.floor(1000.0 * (double)b.fireFunded / (double)b.fireRequest) :
 			1000;
+		eduEffect = b.eduRequest != 0 ?
+			(int)Math.floor(100.0 * (double)b.eduFunded / (double)b.eduRequest) :
+			100;
+		healthEffect = b.healthRequest != 0 ?
+			(int)Math.floor(100.0 * (double)b.healthFunded / (double)b.healthRequest) :
+			100;
+		parksEffect = b.parksRequest != 0 ?
+			(int)Math.floor(100.0 * (double)b.parksFunded / (double)b.parksRequest) :
+			100;
 	}
 
 	public static class FinancialHistory
@@ -1763,7 +1791,13 @@ public class Micropolis
 	{
 		int revenue = budget.taxFund / TAXFREQ;
 		int expenses = -(budget.roadFundEscrow + budget.fireFundEscrow + budget.policeFundEscrow) / TAXFREQ;
-		int policies = 100;
+		int policies = (budget.healthcareDivestment + budget.parksDivestment + budget.educationDivestment) / TAXFREQ;
+		System.out.println("divestments");
+		System.out.println(budget.healthcareDivestment);
+		System.out.println(budget.parksDivestment);
+		System.out.println(budget.educationDivestment);
+		System.out.println("policies");
+		System.out.println(policies);
 
 		FinancialHistory hist = new FinancialHistory();
 		hist.cityTime = cityTime;
@@ -1780,6 +1814,9 @@ public class Micropolis
 		budget.roadFundEscrow = 0;
 		budget.fireFundEscrow = 0;
 		budget.policeFundEscrow = 0;
+		budget.educationDivestment = 0;
+		budget.healthcareDivestment = 0;
+		budget.parksDivestment = 0;
 	}
 
 	/** Annual maintenance cost of each police station. */
@@ -1798,6 +1835,9 @@ public class Micropolis
 		b.roadPercent = Math.max(0.0, roadPercent);
 		b.firePercent = Math.max(0.0, firePercent);
 		b.policePercent = Math.max(0.0, policePercent);
+		b.eduPercent = Math.max(0.0, eduPercent);
+		b.healthPercent = Math.max(0.0, healthPercent);
+		b.parksPercent = Math.max(0.0, parksPercent);
 
 		b.previousBalance = budget.totalFunds;
 		b.taxIncome = (int)Math.round(lastTotalPop * landValueAverage / 120 * b.taxRate * FLevels[gameLevel]);
@@ -1806,10 +1846,25 @@ public class Micropolis
 		b.roadRequest = (int)Math.round((lastRoadTotal + lastRailTotal * 2) * RLevels[gameLevel]);
 		b.fireRequest = FIRE_STATION_MAINTENANCE * lastFireStationCount;
 		b.policeRequest = POLICE_STATION_MAINTENANCE * lastPoliceCount;
+		
+		int eduBase = (int)Math.round(lastCityPop / 50);
+		int healthBase = (int)Math.round(lastCityPop / 25);
+		int parksBase = (int)Math.round(lastCityPop / 100);
+
+		b.eduRequest = eduBase;
+		b.healthRequest = healthBase;
+		b.parksRequest = parksBase;
 
 		b.roadFunded = (int)Math.round(b.roadRequest * b.roadPercent);
 		b.fireFunded = (int)Math.round(b.fireRequest * b.firePercent);
 		b.policeFunded = (int)Math.round(b.policeRequest * b.policePercent);
+		b.eduFunded = eduBase - (int)Math.round(b.eduRequest * b.eduPercent);
+		b.healthFunded = healthBase - (int)Math.round(b.healthRequest * b.healthPercent);
+		b.parksFunded = parksBase - (int)Math.round(b.parksRequest * b.parksPercent);
+		
+		b.eduRequest = eduBase - b.eduFunded;
+		b.healthRequest = healthBase - b.healthFunded;
+		b.parksRequest = parksBase - b.parksFunded;
 
 		int yumDuckets = budget.totalFunds + b.taxIncome;
 		assert yumDuckets >= 0;
@@ -1856,7 +1911,7 @@ public class Micropolis
 			b.policePercent = 0.0;
 		}
 
-		b.operatingExpenses = b.roadFunded + b.fireFunded + b.policeFunded;
+		b.operatingExpenses = b.roadFunded + b.fireFunded + b.policeFunded - b.eduFunded  - b.healthFunded  - b.parksFunded;
 		b.newBalance = b.previousBalance + b.taxIncome - b.operatingExpenses;
 
 		return b;
@@ -1969,6 +2024,12 @@ public class Micropolis
 		firePercent = (double)n / 65536.0;
 		n = dis.readInt();                     //62,63... road percent
 		roadPercent = (double)n / 65536.0;
+		n = dis.readInt();					   //64,65... edu percent?
+		eduPercent = (double)n / 65536.0;
+		n = dis.readInt();					   //66,67... health percent?
+		healthPercent = (double)n / 65536.0;
+		n = dis.readInt();					   //68,69... parks percent?
+		parksPercent = (double)n / 65536.0;
 
 		for (int i = 64; i < 120; i++)
 		{
@@ -2027,6 +2088,9 @@ public class Micropolis
 		out.writeInt((int)(policePercent * 65536));
 		out.writeInt((int)(firePercent * 65536));
 		out.writeInt((int)(roadPercent * 65536));
+		out.writeInt((int)(eduPercent * 65536));
+		out.writeInt((int)(healthPercent * 65536));
+		out.writeInt((int)(parksPercent * 65536));
 
 		//64
 		for (int i = 64; i < 120; i++) {
